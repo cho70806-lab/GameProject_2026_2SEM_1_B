@@ -93,7 +93,8 @@ public class PlayerPickup : MonoBehaviour
     }
     private PickupIten FindClosestItem()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, -0, QueryTriggerInteraction.Collide);
+        // 레이어 마스크 매개변수(-0) 제거
+        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, Physics.AllLayers, QueryTriggerInteraction.Collide);
         PickupIten closestItem = null;
         float closestDistance = Mathf.Infinity;
 
@@ -116,7 +117,8 @@ public class PlayerPickup : MonoBehaviour
 
     private Door FindClosestDoor()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position,detectionRadius,-0, QueryTriggerInteraction.Collide);
+        // 레이어 마스크 매개변수(-0) 제거
+        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, Physics.AllLayers, QueryTriggerInteraction.Collide);
         Door closestDoor = null;
         float closestDistance = Mathf.Infinity;
 
@@ -126,7 +128,7 @@ public class PlayerPickup : MonoBehaviour
 
             if (door == null) continue;
 
-            float distance = Vector3.Distance(transform.position,door.transform.position);
+            float distance = Vector3.Distance(transform.position, door.transform.position);
 
             if (distance < closestDistance)
             {
@@ -140,13 +142,14 @@ public class PlayerPickup : MonoBehaviour
 
     private NPC FindClosestNPC()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, -0, QueryTriggerInteraction.Collide);
+        // -0 대신 Physics.AllLayers를 사용하여 모든 레이어를 감지하도록 수정
+        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, Physics.AllLayers, QueryTriggerInteraction.Collide);
         NPC closestNPC = null;
         float closestDistance = Mathf.Infinity;
 
         foreach (Collider itemCollider in colliders)
         {
-            NPC npc= itemCollider.GetComponentInParent<NPC>();
+            NPC npc = itemCollider.GetComponentInParent<NPC>();
 
             if (npc == null) continue;
 
