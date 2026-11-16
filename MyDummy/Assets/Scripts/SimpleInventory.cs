@@ -27,10 +27,26 @@ public class SimpleInventory : MonoBehaviour
     private bool isOpen;
 
     [SerializeField] private int selectedIndex = -1;        //4개
-    //-1 : 선택 없음, 0 첫번째 슬롯, 1두번째 슬롯 ~>4
+                                                            //-1 : 선택 없음, 0 첫번째 슬롯, 1두번째 슬롯 ~>4
+    private AchievementManager achievementManager;                                                        // SimpleInventory.cs 내부에 추가
+    public int GetItemAmount(string itemName)
+    {
+        int totalAmount = 0;
 
+        // 예시: items라는 리스트나 배열로 아이템을 관리하고 있을 경우
+        foreach (var item in items)
+        {
+            if (item.itemName == itemName) // 변수명은 실제 코드에 맞게 수정
+            {
+                totalAmount += item.amount; // 개수를 저장하는 변수명 (없다면 totalAmount++)
+            }
+        }
+
+        return totalAmount;
+    }
     private void Awake()
     {
+        achievementManager = FindFirstObjectByType<AchievementManager>();
         playerController = GetComponent<PlayerController>();
         playerPickup = GetComponent<PlayerPickup>();
 
@@ -207,8 +223,11 @@ public class SimpleInventory : MonoBehaviour
         {
             selectedItemText.text = item.itemName + "은(는) 사용 할 수 없습니다."; return;
         }
-
         playerHealth.Heal(healAmount);
+        if (achievementManager != null)
+        {
+            achievementManager.ItemUsed(item.itemName);
+        }
         RemoveItem(item.itemName, 1);
     }
     public void DropSelectedItem()
@@ -217,7 +236,13 @@ public class SimpleInventory : MonoBehaviour
 
         string itemName = items[selectedIndex].itemName;
 
-        RemoveItem(itemName, 1);
+        if (RemoveItem(itemName, 1))
+        {
+            if (achievementManager != null)
+            {
+                achievementManager.ItemDropped();
+            }
+        }
     }
 }
 
